@@ -21,8 +21,6 @@ public class Animal {
 
     private final Genome genome = new Genome();
 
-    private final ArrayList<IPositionChangeObserver> positionChangeObserversList = new ArrayList<>();
-
     public Animal(AbstractMap map, Vector2d position, int initialEnergyLevel, int moveEnergy) {
         this.map = map;
         this.position = position;
@@ -43,12 +41,14 @@ public class Animal {
 
         if (direction == 0) {
             makeMove(position.add(this.direction.toUnitVector()));
+        } else if (direction == 7) {
+            makeMove(position.subtract(this.direction.toUnitVector()));
         } else if (direction < 5) {
             for (int i = 0; i < direction; i++) {
                 this.direction = this.direction.next();
             }
         } else {
-            for (int i = 7; i >= direction; i--) {
+            for (int i = 6; i >= direction; i--) {
                 this.direction = this.direction.previous();
             }
         }
@@ -64,11 +64,33 @@ public class Animal {
 
     public void eat(Plant plant) {
         energyLevel += plant.energyBoost();
-        map.plantDestroy(position,plant);
+        map.plantDestroy(position);
+    }
+
+    public void consumption(Vector2d position) {
+        if (map.isPlantOnField(position)) {
+            this.eat(map.plantAt(position));
+        }
     }
 
     public void fatigue() {
         energyLevel -= fatigueEnergyLoss;
+    }
+
+    public int getEnergyLevel() {
+        return energyLevel;
+    }
+
+    public int getInitialEnergyLevel() {
+        return initialEnergyLevel;
+    }
+
+    public int getFatigueEnergyLoss() {
+        return fatigueEnergyLoss;
+    }
+
+    public void setEnergyLevel(int energyLevel) {
+        this.energyLevel = energyLevel;
     }
 
     void addObserver(IPositionChangeObserver observer) {
@@ -86,14 +108,14 @@ public class Animal {
         if (map.canMoveTo(newPosition)) {
             positionChanged(newPosition);
             this.position = newPosition;
+            consumption(newPosition);
         }
     }
 
     private void positionChanged(Vector2d newPosition) {
-        for (IPositionChangeObserver observer : positionChangeObserversList) {
+        for (IPositionChangeObserver observer : observerList) {
             observer.positionChanged(this, newPosition);
         }
     }
-
 
 }

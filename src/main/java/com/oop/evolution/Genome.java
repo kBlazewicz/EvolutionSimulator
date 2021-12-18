@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 
+import static java.lang.Math.round;
+
 public class Genome {
 
     private final ArrayList<Integer> genome = generateGenomes();
@@ -22,6 +24,29 @@ public class Genome {
         }
 
         return generator.getDistributedRandomNumber();
+    }
+
+    public void genomeFromParents(Animal animal1, Animal animal2) {
+        Random number = new Random();
+        int strongerSide = number.nextInt(2);
+        if (strongerSide == 1) {
+            Animal temprary = animal1;
+            animal1 = animal2;
+            animal2 = temprary;
+        }
+
+        int genomesFromFirst = round(32 * animal1.getEnergyLevel() /
+                (animal2.getEnergyLevel() + animal1.getEnergyLevel()));
+        ArrayList<Integer> genome1 = animal1.getGenome().getGenome();
+        ArrayList<Integer> genome2 = animal2.getGenome().getGenome();
+
+        for (int i = 0; i < genomesFromFirst; i++) {
+            this.genome.set(i, genome1.get(i));
+        }
+
+        for (int i = genomesFromFirst; i < 32; i++) {
+            this.genome.set(i, genome2.get(i));
+        }
     }
 
     private double[] movePreferences() {

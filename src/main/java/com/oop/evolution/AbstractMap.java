@@ -4,12 +4,13 @@ import java.util.*;
 
 public abstract class AbstractMap implements IWorldMap {
 
+    private final int[][] animalFieldCount;
+
     private final Vector2d size;
 
-    //the animal are first because they are unique key nad plants to keep the flow
     private final LinkedHashMap<Animal, Vector2d> animalsMap = new LinkedHashMap<>();
 
-    private final LinkedHashMap<Plant, Vector2d> plantsMap = new LinkedHashMap<>();
+    private final LinkedHashMap<Vector2d, Plant> plantsMap = new LinkedHashMap<>();
 
     private final Jungle jungle;
 
@@ -25,6 +26,7 @@ public abstract class AbstractMap implements IWorldMap {
         this.jungle = new Jungle(this, jungleRatio);
         this.plantEnergySource = plantEnergySource;
         makePlantSpaceArrays();
+        animalFieldCount = new int[width + 1][height + 1];
     }
 
     public Vector2d getSize() {
@@ -32,10 +34,10 @@ public abstract class AbstractMap implements IWorldMap {
     }
 
     public void placePlant(Vector2d position, Plant plant) {
-        if (plantsMap.containsValue(position)) {
+        if (plantsMap.containsKey(position)) {
             return;
         }
-        plantsMap.put(plant, position);
+        plantsMap.put(position, plant);
     }
 
     public void generateGrass() {
@@ -44,7 +46,7 @@ public abstract class AbstractMap implements IWorldMap {
             int index = number.nextInt(normalFreePlantSpaces.size());
             Vector2d normalPlantVector = normalFreePlantSpaces.get(index);
             normalFreePlantSpaces.remove(index);
-            placePlant(normalPlantVector,new Plant(normalPlantVector,this,plantEnergySource));
+            placePlant(normalPlantVector, new Plant(normalPlantVector, this, plantEnergySource));
         }
 
         if (!jungleFreePlantSpaces.isEmpty()) {
@@ -52,19 +54,23 @@ public abstract class AbstractMap implements IWorldMap {
             int index = number.nextInt(jungleFreePlantSpaces.size());
             Vector2d junglePlantVector = jungleFreePlantSpaces.get(index);
             jungleFreePlantSpaces.remove(index);
-            placePlant(junglePlantVector,new Plant(junglePlantVector,this,plantEnergySource));
+            placePlant(junglePlantVector, new Plant(junglePlantVector, this, plantEnergySource));
         }
     }
 
-    public void plantDestroy(Vector2d position,Plant plant){
-        if(plantsMap.containsValue(position)) {
+    public void plantDestroy(Vector2d position) {
+        if (plantsMap.containsKey(position)) {
             if (jungle.isJungle(position)) {
                 jungleFreePlantSpaces.add(position);
             } else {
                 normalFreePlantSpaces.add(position);
             }
-            plantsMap.remove(plant);
+            plantsMap.remove(position);
         }
+    }
+
+    public boolean isPlantOnField(Vector2d position) {
+        return plantsMap.containsKey(position);
     }
 
 
@@ -81,8 +87,17 @@ public abstract class AbstractMap implements IWorldMap {
         }
     }
 
+    public int[][] getAnimalFieldCount() {
+        return animalFieldCount;
+    }
+
     @Override
-    public ArrayList<Animal> objectsAt(Vector2d vector2d) {
+    public Plant plantAt(Vector2d vector2d) {
+        return plantsMap.get(vector2d);
+    }
+
+    @Override
+    public ArrayList<Animal> animalsAt(Vector2d vector2d) {
         ArrayList<Animal> animals = new ArrayList<>(0);
         animalsMap.keySet().forEach(key -> {
             if (animalsMap.get(key) == vector2d) animals.add(key);
@@ -97,14 +112,19 @@ public abstract class AbstractMap implements IWorldMap {
 
     @Override
     public boolean place(Animal animal) {
+        Vector2d position = animal.getPosition();
+        animalFieldCount[position.x][position.y] += 1;
         animal.addObserver(this);
         return true;
     }
 
     @Override
     public void positionChanged(Animal animal, Vector2d newPosition) {
+        Vector2d oldPosition = animal.getPosition();
         animalsMap.remove(animal);
         animalsMap.put(animal, newPosition);
+        animalFieldCount[oldPosition.x][oldPosition.y] -= 1;
+        animalFieldCount[newPosition.x][newPosition.y] += 1;
     }
 
     @Override

@@ -2,9 +2,9 @@ package com.oop.evolution;
 
 public class BorderedMap extends AbstractMap {
 
+    protected BorderedMap(int width, int height, double jungleRatio, int plantEnergySource) {
+        super(width, height, jungleRatio, plantEnergySource);
 
-    public BorderedMap(int width, int height) {
-        super(width, height);
     }
 
     @Override
