@@ -24,6 +24,10 @@ public class Vector2d {
         return this.x > other.x && this.y > other.y;
     }
 
+    public boolean followsOrEquals(Vector2d other) {
+        return this.x >= other.x && this.y >= other.y;
+    }
+
     public Vector2d upperRight(Vector2d other) {
         return new Vector2d(Math.max(this.x, other.x), Math.max(this.y, other.y));
     }

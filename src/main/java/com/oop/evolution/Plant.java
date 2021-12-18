@@ -8,13 +8,13 @@ public class Plant {
 
     private final int energySource;
 
-    Plant(Vector2d position, IWorldMap map,int plantEnergy) {
+    Plant(Vector2d position, IWorldMap map, int plantEnergy) {
         this.position = position;
         this.map = map;
-        energySource=plantEnergy;
+        energySource = plantEnergy;
     }
 
-    public int energyBoost(){
+    public int energyBoost() {
         return energySource;
     }
 }

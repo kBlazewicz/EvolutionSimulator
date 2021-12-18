@@ -10,6 +10,6 @@ public class BorderedMap extends AbstractMap {
     @Override
     public boolean canMoveTo(Vector2d position) {
         return !(position.hasGreaterParameter(getSize())
-                || position.hasSmallerParameter(new Vector2d(0,0)));
+                || position.hasSmallerParameter(new Vector2d(0, 0)));
     }
 }

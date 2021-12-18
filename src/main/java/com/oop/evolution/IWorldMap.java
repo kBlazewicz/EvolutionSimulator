@@ -10,4 +10,6 @@ public interface IWorldMap extends IPositionChangeObserver {
 
     ArrayList<Animal> objectsAt(Vector2d vector2d);
 
+    Vector2d getSize();
+
 }

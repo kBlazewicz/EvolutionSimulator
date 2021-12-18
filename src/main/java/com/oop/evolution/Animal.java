@@ -7,7 +7,7 @@ public class Animal {
 
     private Vector2d position;
 
-    private final IWorldMap map;
+    private final AbstractMap map;
 
     private final int initialEnergyLevel;
 
@@ -19,18 +19,21 @@ public class Animal {
 
     private final ArrayList<IPositionChangeObserver> observerList = new ArrayList<IPositionChangeObserver>(0);
 
-    //TODO Genome
-    //private Genome genome;
+    private final Genome genome = new Genome();
 
-    private final ArrayList<IPositionChangeObserver> positionChangeObserversList = new ArrayList<IPositionChangeObserver>(0);
+    private final ArrayList<IPositionChangeObserver> positionChangeObserversList = new ArrayList<>();
 
-    public Animal(IWorldMap map, Vector2d position, int initialEnergyLevel, int moveEnergy) {
+    public Animal(AbstractMap map, Vector2d position, int initialEnergyLevel, int moveEnergy) {
         this.map = map;
         this.position = position;
         this.initialEnergyLevel = initialEnergyLevel;
         this.energyLevel = initialEnergyLevel;
         fatigueEnergyLoss = moveEnergy;
         this.map.place(this);
+    }
+
+    public Genome getGenome() {
+        return genome;
     }
 
     public void move(int direction) {
@@ -61,6 +64,7 @@ public class Animal {
 
     public void eat(Plant plant) {
         energyLevel += plant.energyBoost();
+        map.plantDestroy(position,plant);
     }
 
     public void fatigue() {
