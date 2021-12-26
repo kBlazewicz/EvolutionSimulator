@@ -18,9 +18,12 @@ public class Breeding {
         this.map = map;
     }
 
-    public Animal[] classicBreeding() {
-        Animal animal1 = animalList.get(1);
-        Animal animal2 = animalList.get(0);
+    public void classicBreeding() {
+        if (animalList.size() < 2) {
+            return;
+        }
+        Animal animal1 = animalList.get(0);
+        Animal animal2 = animalList.get(1);
 
 
         for (Animal animal : animalList) {
@@ -33,14 +36,10 @@ public class Breeding {
         if (animal2.getEnergyLevel() >= 0.5 * animal2.getInitialEnergyLevel()) {
             Animal child = new Animal(map, position, animal1.getInitialEnergyLevel(), animal1.getFatigueEnergyLoss());
             child.getGenome().genomeFromParents(animal1, animal2);
-
             animal1.setEnergyLevel((int) round(animal1.getEnergyLevel() * 0.75));
             animal2.setEnergyLevel((int) round(animal2.getEnergyLevel() * 0.75));
             int energy = (int) round(animal1.getEnergyLevel() * 0.25) + (int) round(animal2.getEnergyLevel() * 0.25);
             child.setEnergyLevel(energy);
-            map.newBorn();
-            return new Animal[]{animal1, animal2};
         }
-        return new Animal[]{};
     }
 }

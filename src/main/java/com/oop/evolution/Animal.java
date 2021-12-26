@@ -14,15 +14,14 @@ public class Animal {
 
     private int energyLevel;
 
-    private MapDirection direction = MapDirection.generateRandomDirection();
-
     private final int fatigueEnergyLoss;
 
-    private final ArrayList<IPositionChangeObserver> positionChangeObservers = new ArrayList<IPositionChangeObserver>(0);
+    private MapDirection direction = MapDirection.generateRandomDirection();
 
-    private final ArrayList<IEnergyObserver> energyObservers = new ArrayList<IEnergyObserver>(0);
+    private final ArrayList<IPositionChangeObserver> positionChangeObservers = new ArrayList<>(0);
 
     private final Genome genome = new Genome();
+
 
     public Animal(AbstractMap map, Vector2d position, int initialEnergyLevel, int moveEnergy) {
         this.map = map;
@@ -57,27 +56,27 @@ public class Animal {
                 this.direction = this.direction.previous();
             }
         }
+        fatigue();
+
     }
 
-    public MapDirection getDirection() {
-        return direction;
-    }
+    private void makeMove(Vector2d newPosition) {
+        if (map.canMoveTo(newPosition)) {
+            positionChanged(newPosition);
+            this.position = newPosition;
+        }
 
-    public Vector2d getPosition() {
-        return position;
     }
 
     public void eat(Plant plant, int animalsEating) {
         energyLevel += (int) floor(plant.energyBoost() / animalsEating);
         map.plantDestroy(position);
-        energyUpdate();
     }
 
     public void consumption(Vector2d position) {
         if (map.isPlantOnField(position)) {
             ArrayList<Animal> animals = map.animalsAt(position);
             if (animals.size() > 1) {
-                Animal strongestAnimal = this;
                 int animalsEating = 1;
                 for (Animal animal : animals) {
                     if (animal.getEnergyLevel() > energyLevel) {
@@ -86,14 +85,24 @@ public class Animal {
                         animalsEating += 1;
                     }
                 }
+                this.eat(map.plantAt(position), animalsEating);
+            } else {
                 this.eat(map.plantAt(position), 1);
+
             }
         }
     }
 
     public void fatigue() {
         energyLevel -= fatigueEnergyLoss;
-        energyUpdate();
+    }
+
+    public MapDirection getDirection() {
+        return direction;
+    }
+
+    public Vector2d getPosition() {
+        return position;
     }
 
     public int getEnergyLevel() {
@@ -110,38 +119,13 @@ public class Animal {
 
     public void setEnergyLevel(int energyLevel) {
         this.energyLevel = energyLevel;
-        energyUpdate();
-
     }
 
-    void addPositionObserver(IPositionChangeObserver observer) {
+    public void addPositionObserver(IPositionChangeObserver observer) {
         if (positionChangeObservers.contains(observer)) {
             return;
         }
         positionChangeObservers.add(observer);
-    }
-
-    void removePositionObserver(IPositionChangeObserver observer) {
-        positionChangeObservers.remove(observer);
-    }
-    void addEnergyObserver(IEnergyObserver observer) {
-        if (energyObservers.contains(observer)) {
-            return;
-        }
-        energyObservers.add(observer);
-    }
-
-    void removeEnergyObserver(IEnergyObserver observer) {
-        energyObservers.remove(observer);
-    }
-
-    private void makeMove(Vector2d newPosition) {
-        consumption(getPosition());
-        if (map.canMoveTo(newPosition)) {
-            fatigue();
-            positionChanged(newPosition);
-            this.position = newPosition;
-        }
     }
 
     private void positionChanged(Vector2d newPosition) {
@@ -150,10 +134,5 @@ public class Animal {
         }
     }
 
-    private void energyUpdate() {
-        for (IEnergyObserver observer : energyObservers) {
-            observer.energyUpdate(this);
-        }
-    }
 
 }
