@@ -22,6 +22,7 @@ public abstract class AbstractMap implements IWorldMap {
     private final ArrayList<Vector2d> normalFreePlantSpaces = new ArrayList<>(0);
 
     private final ArrayList<Animal> animalArrayList = new ArrayList<>();
+    private final ArrayList<Animal> deadAnimals = new ArrayList<>();
 
 
     protected AbstractMap(int width, int height, double jungleRatio, int plantEnergySource) {
@@ -36,11 +37,13 @@ public abstract class AbstractMap implements IWorldMap {
         return size;
     }
 
-    public void clear() {
+    public void clear(int date) {
         ArrayList<Animal> toDelete = new ArrayList<>();
         for (Animal animal : animalsMap.keySet()) {
             if (animal.getEnergyLevel() <= 0) {
                 toDelete.add(animal);
+                animal.setDeathTime(date);
+                deadAnimals.add(animal);
             }
         }
 
@@ -59,6 +62,15 @@ public abstract class AbstractMap implements IWorldMap {
     }
 
     //ANIMALS
+    public int averageLifeTime(){
+        int time = 0;
+        for(Animal animal: deadAnimals){
+            time+=animal.getDeathTime();
+        }
+        if(time==0)return 0;
+        return time/ deadAnimals.size();
+    }
+
     public int getNumberOfAnimals() {
         return animalArrayList.size();
     }
@@ -121,6 +133,9 @@ public abstract class AbstractMap implements IWorldMap {
 
     public boolean isPlantOnField(Vector2d position) {
         return plantsMap.containsKey(position);
+    }
+    public int numberOfPlants(){
+        return plantsMap.size();
     }
 
     public void generateGrass() {

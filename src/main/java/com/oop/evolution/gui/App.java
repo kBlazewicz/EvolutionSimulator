@@ -11,6 +11,9 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -29,13 +32,24 @@ public class App extends Application {
     private final Label daysLabel = new Label("current day: ");
     private final Label daysLabel2 = new Label("current day: ");
     private final Button play = new Button("Play1");
-    private Button pause = new Button("Pause1");
+    private final Button pause = new Button("Pause1");
     private final Button play2 = new Button("Play2");
-    private Button pause2 = new Button("Pause2");
+    private final Button pause2 = new Button("Pause2");
     private final Button off = new Button("Off");
     private final GridPane grid1 = new GridPane();
     private final GridPane grid2 = new GridPane();
     private Stage window;
+    private XYChart.Series seriesAnimalsPopulation = new XYChart.Series();
+    private XYChart.Series seriesPlantsPopulation = new XYChart.Series();
+    private XYChart.Series seriesAverageEnergy = new XYChart.Series();
+    private XYChart.Series seriesAverageChildrenAmount = new XYChart.Series();
+    private XYChart.Series seriesAverageLifeTime = new XYChart.Series();;
+
+    private XYChart.Series series2AnimalsPopulation = new XYChart.Series();
+    private XYChart.Series series2PlantsPopulation = new XYChart.Series();
+    private XYChart.Series series2AverageEnergy = new XYChart.Series();
+    private XYChart.Series series2AverageChildrenAmount = new XYChart.Series();
+    private XYChart.Series series2AverageLifeTime = new XYChart.Series();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -92,13 +106,13 @@ public class App extends Application {
 
         //Form Field
         Label lblPlantEnergySource = new Label("PlantEnergySource");
-        TextField txtPlantEnergySource = new TextField("150");
+        TextField txtPlantEnergySource = new TextField("50");
         formGrid.add(lblPlantEnergySource, 0, 6);
         formGrid.add(txtPlantEnergySource, 1, 6);
 
         //Form Field
         Label lblJungleRatio = new Label("JungleRatio");
-        TextField txtJungleRatio = new TextField("0.5");
+        TextField txtJungleRatio = new TextField("0.3");
         formGrid.add(lblJungleRatio, 0, 7);
         formGrid.add(txtJungleRatio, 1, 7);
 
@@ -112,19 +126,81 @@ public class App extends Application {
         root.setAlignment(Pos.CENTER);
 
         VBox buttons = new VBox();
-        Button changeScene = new Button("Set parameters");
-        buttons.getChildren().add(changeScene);
-        buttons.getChildren().add(play);
-        buttons.getChildren().add(pause);
-        buttons.getChildren().add(play2);
-        buttons.getChildren().add(pause2);
+        VBox Map1 = new VBox();
+        VBox Map2 = new VBox();
+
+        Map1.getChildren().add(play);
+        Map1.getChildren().add(pause);
+        Map1.getChildren().add(daysLabel);
+        Map1.getChildren().add(grid1);
+
+        Map2.getChildren().add(play2);
+        Map2.getChildren().add(pause2);
+        Map2.getChildren().add(daysLabel2);
+        Map2.getChildren().add(grid2);
+
+
         buttons.getChildren().add(off);
-        buttons.getChildren().add(daysLabel);
-        buttons.getChildren().add(daysLabel2);
-        root.getChildren().add(grid1);
+        root.getChildren().add(Map1);
+        root.getChildren().add(Map2);
         root.getChildren().add(buttons);
-        root.getChildren().add(grid2);
-        Scene scene = new Scene(root, 1000, 1000);
+        Scene scene = new Scene(root, 1000, 800);
+
+
+        //chart1
+        final NumberAxis xAxis = new NumberAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        xAxis.setLabel("Day");
+
+        final LineChart<Number, Number> lineChart =
+                new LineChart<Number, Number>(xAxis, yAxis);
+
+        lineChart.setTitle("Map 1 Statisitcs");
+        Map1.getChildren().add(lineChart);
+
+
+        //chart2
+        final NumberAxis xAxis2 = new NumberAxis();
+        final NumberAxis yAxis2 = new NumberAxis();
+        xAxis2.setLabel("Day");
+
+        final LineChart<Number, Number> lineChart2 =
+                new LineChart<Number, Number>(xAxis2, yAxis2);
+
+        lineChart2.setTitle("Map 2 Statisitcs");
+        Map2.getChildren().add(lineChart2);
+
+        series2AnimalsPopulation.setName("Animals amount");
+        lineChart2.getData().add(series2AnimalsPopulation);
+
+        series2PlantsPopulation.setName("Plants amount");
+        lineChart2.getData().add(series2PlantsPopulation);
+
+        series2AverageEnergy.setName("Average energy");
+        lineChart2.getData().add(series2AverageEnergy);
+
+        series2AverageChildrenAmount.setName("Average children amount");
+        lineChart2.getData().add(series2AverageChildrenAmount);
+
+        series2AverageLifeTime.setName("Average length of life");
+        lineChart2.getData().add(series2AverageLifeTime);
+
+
+        seriesAnimalsPopulation.setName("Animals amount");
+        lineChart.getData().add(seriesAnimalsPopulation);
+
+        seriesPlantsPopulation.setName("Plants amount");
+        lineChart.getData().add(seriesPlantsPopulation);
+
+        seriesAverageEnergy.setName("Average energy");
+        lineChart.getData().add(seriesAverageEnergy);
+
+        seriesAverageChildrenAmount.setName("Average children amount");
+        lineChart.getData().add(seriesAverageChildrenAmount);
+
+        seriesAverageLifeTime.setName("Average length of life");
+        lineChart.getData().add(seriesAverageLifeTime);
+
 
         play.setOnAction(new EventHandler() {
             @Override
@@ -160,19 +236,6 @@ public class App extends Application {
 
 
 
-        changeScene.setOnAction(new EventHandler() {
-            @Override
-            public void handle(Event event) {
-                try {
-                    engine.stop();
-                    engine2.stop();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                window.setScene(scene2);
-            }
-        });
         parametersBtn.setOnAction(new EventHandler() {
             @Override
             public void handle(Event event) {
@@ -180,21 +243,20 @@ public class App extends Application {
                 try {
                     window.setScene(scene);
                     stop();
-                    engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()),false);
-                    engine2 = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()),true);
-//                    engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()),true);
-                    renderGrid(grid1,engine);
+                    engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()), false);
+                    engine2 = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()), true);
+                    renderGrid(grid1, engine);
                     renderGrid(grid2, engine2);
                     engine.addMapChangeListener(new IMapChangeObserver() {
                         @Override
                         public void refreshMap() throws InterruptedException {
-                            updateMap();
+                            updateMap1();
                         }
                     });
                     engine2.addMapChangeListener(new IMapChangeObserver() {
                         @Override
                         public void refreshMap() throws InterruptedException {
-                            updateMap();
+                            updateMap2();
                         }
                     });
                 } catch (Exception e) {
@@ -209,10 +271,10 @@ public class App extends Application {
         window.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                if(engine != null) {
+                if (engine != null) {
                     engine.shutdown();
                 }
-                if(engine2 != null) {
+                if (engine2 != null) {
                     engine2.shutdown();
                 }
             }
@@ -233,17 +295,13 @@ public class App extends Application {
                 if (!map.animalsAt(position).isEmpty()) {
                     double percentage = map.strongestAnimal(map.animalsAt(position)).getEnergyPercentage();
 
-                    if(percentage < 0.3){
+                    if (percentage < 0.3) {
                         b.setStyle("-fx-background-color: #e796e7; ");
-                    }
-                    else if(percentage < 0.6){
+                    } else if (percentage < 0.6) {
                         b.setStyle("-fx-background-color: #e764b7; ");
-                    }
-                    else if(percentage < 0.9){
+                    } else if (percentage < 0.9) {
                         b.setStyle("-fx-background-color: #e728a7; ");
-                    }
-
-                    else{
+                    } else {
                         b.setStyle("-fx-background-color: #b30255; ");
                     }
 
@@ -260,14 +318,37 @@ public class App extends Application {
         }
     }
 
-    private void updateMap() {
+    private void updateMap1() {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                daysLabel.setText(String.valueOf("current day on Map1: " + engine.getDate()));
-                daysLabel2.setText(String.valueOf("current day on Map2: " + engine2.getDate()));
-                try {
+                int date1 = engine.getDate();
+                daysLabel.setText(String.valueOf("current day on Map1: " + date1));
+                seriesAnimalsPopulation.getData().add(new XYChart.Data(date1, engine.getMap().getAnimalArrayList().size()));
+                seriesPlantsPopulation.getData().add(new XYChart.Data(date1, engine.getMap().numberOfPlants()));
+                seriesAverageEnergy.getData().add(new XYChart.Data(date1, engine.averageEnergy()));
+                seriesAverageChildrenAmount.getData().add(new XYChart.Data(date1, engine.averageAmountOfChildren()));
+                seriesAverageLifeTime.getData().add(new XYChart.Data(date1, engine.averageLifeTime()));                try {
                     renderGrid(grid1, engine);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void updateMap2() {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                int date2 = engine2.getDate();
+                daysLabel2.setText(String.valueOf("current day on Map2: " + date2));
+                series2AnimalsPopulation.getData().add(new XYChart.Data(date2, engine2.getMap().getAnimalArrayList().size()));
+                series2PlantsPopulation.getData().add(new XYChart.Data(date2, engine2.getMap().numberOfPlants()));
+                series2AverageEnergy.getData().add(new XYChart.Data(date2, engine2.averageEnergy()));
+                series2AverageChildrenAmount.getData().add(new XYChart.Data(date2, engine2.averageAmountOfChildren()));
+                series2AverageLifeTime.getData().add(new XYChart.Data(date2, engine2.averageLifeTime()));
+                try {
                     renderGrid(grid2, engine2);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

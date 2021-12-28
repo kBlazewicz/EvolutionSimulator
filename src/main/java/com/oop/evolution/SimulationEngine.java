@@ -39,7 +39,7 @@ public class SimulationEngine {
         run();
     }
 
-    public void run(){
+    public void run() {
         service.submit(new Runnable() {
             @Override
             public void run() {
@@ -57,7 +57,7 @@ public class SimulationEngine {
                         }
 
                         try {
-                            Thread.sleep(200);
+                            Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -68,6 +68,7 @@ public class SimulationEngine {
             }
         });
     }
+
 
     public void shutdown() {
         shutdownRequested = true;
@@ -92,10 +93,10 @@ public class SimulationEngine {
         return map;
     }
 
-    //TODO make private
-    public void nextSimulationDay() throws InterruptedException {
+
+    private void nextSimulationDay() throws InterruptedException {
         System.out.println(date);
-        map.clear();
+        map.clear(date);
 
         ArrayList<Animal> animalArrayList = map.getAnimalArrayList();
         if (!animalArrayList.isEmpty()) {
@@ -113,6 +114,32 @@ public class SimulationEngine {
 
     public void addMapChangeListener(IMapChangeObserver object) {
         mapChangeListeners.add(object);
+    }
+
+    public int averageEnergy(){
+        ArrayList<Animal> animals = map.getAnimalArrayList();
+        int energy=0;
+        for(Animal animal : animals){
+            energy+=animal.getEnergyLevel();
+        }
+        if(energy==0) return 0;
+
+        return energy/animals.size();
+    }
+
+    public int averageAmountOfChildren(){
+        ArrayList<Animal> animals = map.getAnimalArrayList();
+        int average = 0;
+        for(Animal animal : animals){
+           average+=animal.getChildrenAmount();
+        }
+        if(average==0) return 0;
+
+        return average/animals.size();
+    }
+
+    public int averageLifeTime(){
+        return map.averageLifeTime();
     }
 
     private void notifyMapChange() throws InterruptedException {

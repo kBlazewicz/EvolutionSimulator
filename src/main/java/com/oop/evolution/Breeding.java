@@ -12,6 +12,8 @@ public class Breeding {
 
     private final AbstractMap map;
 
+    private int childrenAmount = 0;
+
     public Breeding(Vector2d position, AbstractMap map) {
         this.position = position;
         this.animalList = map.animalsAt(position);
@@ -35,11 +37,18 @@ public class Breeding {
 
         if (animal2.getEnergyLevel() >= 0.5 * animal2.getInitialEnergyLevel()) {
             Animal child = new Animal(map, position, animal1.getInitialEnergyLevel(), animal1.getFatigueEnergyLoss());
+            childrenAmount+=1;
             child.getGenome().genomeFromParents(animal1, animal2);
             animal1.setEnergyLevel((int) round(animal1.getEnergyLevel() * 0.75));
             animal2.setEnergyLevel((int) round(animal2.getEnergyLevel() * 0.75));
             int energy = (int) round(animal1.getEnergyLevel() * 0.25) + (int) round(animal2.getEnergyLevel() * 0.25);
             child.setEnergyLevel(energy);
+            animal1.addChild(child);
+            animal2.addChild(child);
         }
+    }
+
+    public int getChildrenAmount() {
+        return childrenAmount;
     }
 }

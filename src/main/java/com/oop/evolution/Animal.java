@@ -22,6 +22,12 @@ public class Animal {
 
     private final Genome genome = new Genome();
 
+    private final ArrayList<Animal> childrenList = new ArrayList<>();
+
+    private int childrenAmount=0;
+
+    private int deathTime;
+
 
     public Animal(AbstractMap map, Vector2d position, int initialEnergyLevel, int moveEnergy) {
         this.map = map;
@@ -64,6 +70,14 @@ public class Animal {
             newPosition = map.moveTo(newPosition,this.position);
             positionChanged(newPosition);
             this.position = newPosition;
+    }
+
+    public int getDeathTime() {
+        return deathTime;
+    }
+
+    public void setDeathTime(int deathTime) {
+        this.deathTime = deathTime;
     }
 
     public void eat(Plant plant, int animalsEating) {
@@ -128,6 +142,15 @@ public class Animal {
             return;
         }
         positionChangeObservers.add(observer);
+    }
+
+    public void addChild(Animal child){
+        childrenList.add(child);
+        childrenAmount+=1;
+    }
+
+    public int getChildrenAmount(){
+        return childrenAmount;
     }
 
     private void positionChanged(Vector2d newPosition) {
