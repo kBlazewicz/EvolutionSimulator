@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public interface IWorldMap extends IPositionChangeObserver {
 
-    boolean canMoveTo(Vector2d position);
+    Vector2d moveTo(Vector2d position,Vector2d oldPosition);
 
     boolean place(Animal animal);
 

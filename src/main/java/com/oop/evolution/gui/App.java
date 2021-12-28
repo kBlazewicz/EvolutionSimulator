@@ -45,12 +45,7 @@ public class App extends Application {
         window.setY(200);
         grid1.setGridLinesVisible(true);
         grid2.setGridLinesVisible(true);
-        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                engine.shutdown();
-            }
-        });
+
         window.setTitle("Simulation");
 
         //form Scene
@@ -185,8 +180,9 @@ public class App extends Application {
                 try {
                     window.setScene(scene);
                     stop();
-                    engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()));
-                    engine2 = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()));
+                    engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()),false);
+                    engine2 = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()),true);
+//                    engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()),true);
                     renderGrid(grid1,engine);
                     renderGrid(grid2, engine2);
                     engine.addMapChangeListener(new IMapChangeObserver() {
@@ -210,10 +206,21 @@ public class App extends Application {
         window.setScene(scene2);
 
         window.show();
-
+        window.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                if(engine != null) {
+                    engine.shutdown();
+                }
+                if(engine2 != null) {
+                    engine2.shutdown();
+                }
+            }
+        });
     }
 
     private void renderGrid(GridPane grid, SimulationEngine engine) throws InterruptedException {
+
         grid.getChildren().clear();
         AbstractMap map = engine.getMap();
         Vector2d size = map.getSize();
@@ -224,7 +231,23 @@ public class App extends Application {
                 Button b = new Button();
                 b.setMinSize(20, 20);
                 if (!map.animalsAt(position).isEmpty()) {
-                    b.setStyle("-fx-background-color: #ff0000; ");
+                    double percentage = map.strongestAnimal(map.animalsAt(position)).getEnergyPercentage();
+
+                    if(percentage < 0.3){
+                        b.setStyle("-fx-background-color: #e796e7; ");
+                    }
+                    else if(percentage < 0.6){
+                        b.setStyle("-fx-background-color: #e764b7; ");
+                    }
+                    else if(percentage < 0.9){
+                        b.setStyle("-fx-background-color: #e728a7; ");
+                    }
+
+                    else{
+                        b.setStyle("-fx-background-color: #b30255; ");
+                    }
+
+
                 } else if (map.isPlantOnField(position)) {
                     b.setStyle("-fx-background-color: #08ff00; ");
                 } else if (map.isJungle(position)) {

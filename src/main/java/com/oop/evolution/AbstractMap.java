@@ -92,10 +92,18 @@ public abstract class AbstractMap implements IWorldMap {
         return animals;
     }
 
-    @Override
-    public boolean canMoveTo(Vector2d position) {
-        return false;
+    public Animal strongestAnimal(ArrayList<Animal> animals){
+        Animal strongest = animals.get(0);
+        for(Animal animal : animals){
+            if (animal.getEnergyLevel() > strongest.getEnergyLevel()){
+                strongest=animal;
+            }
+        }
+        return strongest;
     }
+
+    @Override
+    public abstract Vector2d moveTo(Vector2d position,Vector2d oldPosition);
 
     @Override
     public void positionChanged(Animal animal, Vector2d newPosition) {
@@ -168,7 +176,6 @@ public abstract class AbstractMap implements IWorldMap {
             plantsMap.remove(position);
         }
     }
-
 
     @Override
     public boolean equals(Object o) {

@@ -5,7 +5,7 @@ plugins {
 }
 
 application {
-    mainClassName = 'com.oop.evolution.world'
+    mainClassName = 'com.oop.evolution.World'
 
 }
 

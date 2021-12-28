@@ -61,11 +61,9 @@ public class Animal {
     }
 
     private void makeMove(Vector2d newPosition) {
-        if (map.canMoveTo(newPosition)) {
+            newPosition = map.moveTo(newPosition,this.position);
             positionChanged(newPosition);
             this.position = newPosition;
-        }
-
     }
 
     public void eat(Plant plant, int animalsEating) {
@@ -109,6 +107,10 @@ public class Animal {
         return energyLevel;
     }
 
+    public double getEnergyPercentage(){
+        return (double)energyLevel/initialEnergyLevel;
+    }
+
     public int getInitialEnergyLevel() {
         return initialEnergyLevel;
     }
@@ -133,6 +135,5 @@ public class Animal {
             observer.positionChanged(this, newPosition);
         }
     }
-
 
 }

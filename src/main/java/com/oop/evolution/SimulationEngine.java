@@ -24,8 +24,13 @@ public class SimulationEngine {
     private final ExecutorService service = Executors.newCachedThreadPool();
 
 
-    public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int animalsAmount, double jungleRatio, int plantEnergySource) {
-        this.map = new BorderedMap(width, height, jungleRatio, plantEnergySource);
+    public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int animalsAmount, double jungleRatio, int plantEnergySource,boolean isBordered) {
+       if(isBordered) {
+           this.map = new BorderedMap(width, height, jungleRatio, plantEnergySource);
+       }
+       else{
+           this.map = new GlobeMap(width,height,jungleRatio,plantEnergySource);
+       }
         this.startEnergy = startEnergy;
         this.moveEnergy = moveEnergy;
         for (int i = 0; i < animalsAmount; i++) {
@@ -52,7 +57,7 @@ public class SimulationEngine {
                         }
 
                         try {
-                            Thread.sleep(400);
+                            Thread.sleep(200);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -97,6 +102,7 @@ public class SimulationEngine {
             for (Animal animal : animalArrayList) {
                 animal.move();
             }
+
             checkForBreeding();
         }
 
