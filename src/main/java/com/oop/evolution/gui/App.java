@@ -1,9 +1,6 @@
 package com.oop.evolution.gui;
 
-import com.oop.evolution.AbstractMap;
-import com.oop.evolution.IMapChangeObserver;
-import com.oop.evolution.SimulationEngine;
-import com.oop.evolution.Vector2d;
+import com.oop.evolution.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -26,16 +23,22 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 public class App extends Application {
     private SimulationEngine engine;
     private SimulationEngine engine2;
     private final Label daysLabel = new Label("current day: ");
     private final Label daysLabel2 = new Label("current day: ");
+    private final Label genome = new Label();
+    private final Label genome2 = new Label();
     private final Button play = new Button("Play1");
     private final Button pause = new Button("Pause1");
     private final Button play2 = new Button("Play2");
     private final Button pause2 = new Button("Pause2");
     private final Button off = new Button("Off");
+    private final Button saveData = new Button("Save Data");
     private final GridPane grid1 = new GridPane();
     private final GridPane grid2 = new GridPane();
     private Stage window;
@@ -50,7 +53,6 @@ public class App extends Application {
     private XYChart.Series series2AverageEnergy = new XYChart.Series();
     private XYChart.Series series2AverageChildrenAmount = new XYChart.Series();
     private XYChart.Series series2AverageLifeTime = new XYChart.Series();
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -72,7 +74,7 @@ public class App extends Application {
         Text formTxt = new Text("Create simulation");
         formTxt.setFont(Font.font("Tahoma", FontWeight.LIGHT, 25));
         formGrid.add(formTxt, 0, 0);
-        Scene scene2 = new Scene(formGrid, 1000, 1000);
+        Scene scene2 = new Scene(formGrid, 1400, 1000);
 
         //Form Field
         Label lblWidth = new Label("Widht");
@@ -131,20 +133,23 @@ public class App extends Application {
 
         Map1.getChildren().add(play);
         Map1.getChildren().add(pause);
-        Map1.getChildren().add(daysLabel);
         Map1.getChildren().add(grid1);
+        Map1.getChildren().add(daysLabel);
+        Map1.getChildren().add(genome);
 
         Map2.getChildren().add(play2);
         Map2.getChildren().add(pause2);
-        Map2.getChildren().add(daysLabel2);
         Map2.getChildren().add(grid2);
+        Map2.getChildren().add(daysLabel2);
+        Map2.getChildren().add(genome2);
 
 
+        buttons.getChildren().add(saveData);
         buttons.getChildren().add(off);
         root.getChildren().add(Map1);
         root.getChildren().add(Map2);
         root.getChildren().add(buttons);
-        Scene scene = new Scene(root, 1000, 800);
+        Scene scene = new Scene(root, 1400, 800);
 
 
         //chart1
@@ -211,6 +216,7 @@ public class App extends Application {
         pause.setOnAction(new EventHandler() {
             @Override
             public void handle(Event event) {
+                engine.getMap().getDominantGenome();
                 engine.stop();
             }
         });
@@ -224,6 +230,7 @@ public class App extends Application {
             @Override
             public void handle(Event event) {
                 engine2.stop();
+                engine2.getMap().getDominantGenome();
             }
         });
         off.setOnAction(new EventHandler() {
@@ -231,6 +238,24 @@ public class App extends Application {
             public void handle(Event event) {
                 engine.shutdown();
                 engine2.shutdown();
+            }
+        });
+        saveData.setOnAction(new EventHandler() {
+            @Override
+            public void handle(Event event) {
+                String data1 = "Wrapped,"+engine.getDate()+","+engine.getMap().getAnimalArrayList().size()+","+
+                        engine.getMap().numberOfPlants()+","+engine.averageEnergy()+","
+                        +engine.averageAmountOfChildren()+","+engine.averageLifeTime()+","+ LocalDate.now()+" "+ LocalTime.now();
+
+                String data2 = "Bounded,"+engine2.getDate()+","+engine2.getMap().getAnimalArrayList().size()+","+
+                        engine2.getMap().numberOfPlants()+","+engine2.averageEnergy()+","
+                        +engine2.averageAmountOfChildren()+","+engine2.averageLifeTime()+","+ LocalDate.now()+" "+ LocalTime.now();
+                try {
+                    HandlerCSV.addRecord(data1);
+                    HandlerCSV.addRecord(data2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
@@ -295,7 +320,11 @@ public class App extends Application {
                 if (!map.animalsAt(position).isEmpty()) {
                     double percentage = map.strongestAnimal(map.animalsAt(position)).getEnergyPercentage();
 
-                    if (percentage < 0.3) {
+                    //TODO dominant genome to variable
+                    if(new GenomeComparator().compare(map.strongestAnimal(map.animalsAt(position)).getGenome().getGenome(),engine.getMap().getDominantGenome()) == 0){
+                        b.setStyle("-fx-background-color: #000000; ");
+                    }
+                    else if (percentage < 0.3) {
                         b.setStyle("-fx-background-color: #e796e7; ");
                     } else if (percentage < 0.6) {
                         b.setStyle("-fx-background-color: #e764b7; ");
@@ -313,6 +342,7 @@ public class App extends Application {
                 } else {
                     b.setStyle("-fx-background-color: #dbcf85; ");
                 }
+                b.setMinSize(1, 1);
                 grid.add(b, i, j, 1, 1);
             }
         }
@@ -323,12 +353,14 @@ public class App extends Application {
             @Override
             public void run() {
                 int date1 = engine.getDate();
-                daysLabel.setText(String.valueOf("current day on Map1: " + date1));
+                daysLabel.setText(String.valueOf("current day on Map 1: " + date1));
+                genome.setText(String.valueOf("Dominant genome: " + engine.getMap().getDominantGenome()));
                 seriesAnimalsPopulation.getData().add(new XYChart.Data(date1, engine.getMap().getAnimalArrayList().size()));
                 seriesPlantsPopulation.getData().add(new XYChart.Data(date1, engine.getMap().numberOfPlants()));
                 seriesAverageEnergy.getData().add(new XYChart.Data(date1, engine.averageEnergy()));
                 seriesAverageChildrenAmount.getData().add(new XYChart.Data(date1, engine.averageAmountOfChildren()));
-                seriesAverageLifeTime.getData().add(new XYChart.Data(date1, engine.averageLifeTime()));                try {
+                seriesAverageLifeTime.getData().add(new XYChart.Data(date1, engine.averageLifeTime()));
+                try {
                     renderGrid(grid1, engine);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -342,7 +374,8 @@ public class App extends Application {
             @Override
             public void run() {
                 int date2 = engine2.getDate();
-                daysLabel2.setText(String.valueOf("current day on Map2: " + date2));
+                daysLabel2.setText(String.valueOf("current day on Map 2: " + date2));
+                genome2.setText(String.valueOf("Dominant genome: " + engine2.getMap().getDominantGenome()));
                 series2AnimalsPopulation.getData().add(new XYChart.Data(date2, engine2.getMap().getAnimalArrayList().size()));
                 series2PlantsPopulation.getData().add(new XYChart.Data(date2, engine2.getMap().numberOfPlants()));
                 series2AverageEnergy.getData().add(new XYChart.Data(date2, engine2.averageEnergy()));

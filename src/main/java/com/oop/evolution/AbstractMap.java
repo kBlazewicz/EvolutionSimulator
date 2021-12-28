@@ -62,13 +62,13 @@ public abstract class AbstractMap implements IWorldMap {
     }
 
     //ANIMALS
-    public int averageLifeTime(){
+    public int averageLifeTime() {
         int time = 0;
-        for(Animal animal: deadAnimals){
-            time+=animal.getDeathTime();
+        for (Animal animal : deadAnimals) {
+            time += animal.getDeathTime();
         }
-        if(time==0)return 0;
-        return time/ deadAnimals.size();
+        if (time == 0) return 0;
+        return time / deadAnimals.size();
     }
 
     public int getNumberOfAnimals() {
@@ -104,18 +104,57 @@ public abstract class AbstractMap implements IWorldMap {
         return animals;
     }
 
-    public Animal strongestAnimal(ArrayList<Animal> animals){
+    public Animal strongestAnimal(ArrayList<Animal> animals) {
         Animal strongest = animals.get(0);
-        for(Animal animal : animals){
-            if (animal.getEnergyLevel() > strongest.getEnergyLevel()){
-                strongest=animal;
+        for (Animal animal : animals) {
+            if (animal.getEnergyLevel() > strongest.getEnergyLevel()) {
+                strongest = animal;
             }
         }
         return strongest;
     }
 
+    public ArrayList<Integer> getDominantGenome() {
+        GenomeComparator comparator = new GenomeComparator();
+        int maxCounter = 0;
+        int counter = 0;
+        ArrayList<ArrayList<Integer>> genomes = new ArrayList<>();
+        for(Animal animal: animalArrayList){
+            genomes.add(animal.getGenome().getGenome());
+        }
+        genomes.sort(comparator);
+        if(genomes.isEmpty()){
+            return new ArrayList<Integer>();
+        }
+        ArrayList<Integer> maxGenome= genomes.get(0);
+        ArrayList<Integer> lastGenome = genomes.get(0);
+        for(ArrayList<Integer> genome : genomes){
+            if (comparator.compare(lastGenome,genome) == 0){
+                counter+=1;
+            }
+            else{
+                if(counter > maxCounter){
+                    maxCounter = counter;
+                    counter = 0;
+                    maxGenome = lastGenome;
+                    lastGenome = genome;
+                }
+            }
+        }
+        if(counter > maxCounter){
+            maxCounter = counter;
+            maxGenome = lastGenome;
+        }
+
+        if(maxCounter > 1) {
+            System.out.println(maxGenome);
+            System.out.println(maxCounter + " <- max genome counter");
+        }
+        return maxGenome;
+    }
+
     @Override
-    public abstract Vector2d moveTo(Vector2d position,Vector2d oldPosition);
+    public abstract Vector2d moveTo(Vector2d position, Vector2d oldPosition);
 
     @Override
     public void positionChanged(Animal animal, Vector2d newPosition) {
@@ -127,14 +166,15 @@ public abstract class AbstractMap implements IWorldMap {
     }
 
     //PLANTING
-    public boolean isJungle(Vector2d position){
+    public boolean isJungle(Vector2d position) {
         return jungle.isJungle(position);
     }
 
     public boolean isPlantOnField(Vector2d position) {
         return plantsMap.containsKey(position);
     }
-    public int numberOfPlants(){
+
+    public int numberOfPlants() {
         return plantsMap.size();
     }
 
