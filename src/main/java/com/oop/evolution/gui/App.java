@@ -14,9 +14,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -53,6 +51,9 @@ public class App extends Application {
     private XYChart.Series series2AverageEnergy = new XYChart.Series();
     private XYChart.Series series2AverageChildrenAmount = new XYChart.Series();
     private XYChart.Series series2AverageLifeTime = new XYChart.Series();
+    private double size = 450;
+    private int height = 1;
+    private int width = 1;
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -61,8 +62,6 @@ public class App extends Application {
         window.setY(200);
         grid1.setGridLinesVisible(true);
         grid2.setGridLinesVisible(true);
-
-        window.setTitle("Simulation");
 
         //form Scene
         GridPane formGrid = new GridPane();
@@ -270,6 +269,8 @@ public class App extends Application {
                     stop();
                     engine = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()), false);
                     engine2 = new SimulationEngine(Integer.parseInt(txtWidth.getText()), Integer.parseInt(txtHeight.getText()), Integer.parseInt(txtStartEnergy.getText()), Integer.parseInt(txtMoveEnergy.getText()), Integer.parseInt(txtAnimalsAmount.getText()), Double.parseDouble(txtJungleRatio.getText()), Integer.parseInt(txtPlantEnergySource.getText()), true);
+                    width = Integer.parseInt(txtWidth.getText());
+                    height = Integer.parseInt(txtHeight.getText());
                     renderGrid(grid1, engine);
                     renderGrid(grid2, engine2);
                     engine.addMapChangeListener(new IMapChangeObserver() {
@@ -315,7 +316,7 @@ public class App extends Application {
         for (int i = 0; i < size.x + 1; i++) {
             for (int j = 0; j < size.y + 1; j++) {
                 Vector2d position = new Vector2d(i, j);
-                Button b = new Button();
+                Pane b = new Pane();
                 b.setMinSize(20, 20);
                 if (!map.animalsAt(position).isEmpty()) {
                     double percentage = map.strongestAnimal(map.animalsAt(position)).getEnergyPercentage();
@@ -342,7 +343,7 @@ public class App extends Application {
                 } else {
                     b.setStyle("-fx-background-color: #dbcf85; ");
                 }
-                b.setMinSize(1, 1);
+                b.setMinSize(this.size/width, this.size/height);
                 grid.add(b, i, j, 1, 1);
             }
         }
