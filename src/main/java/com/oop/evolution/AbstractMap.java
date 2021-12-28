@@ -107,6 +107,10 @@ public abstract class AbstractMap implements IWorldMap {
     }
 
     //PLANTING
+    public boolean isJungle(Vector2d position){
+        return jungle.isJungle(position);
+    }
+
     public boolean isPlantOnField(Vector2d position) {
         return plantsMap.containsKey(position);
     }

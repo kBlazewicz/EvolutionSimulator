@@ -2,7 +2,6 @@ package com.oop.evolution;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Random;
 
 import static java.lang.Math.round;
@@ -47,6 +46,8 @@ public class Genome {
         for (int i = genomesFromFirst; i < 32; i++) {
             this.genome.set(i, genome2.get(i));
         }
+        Collections.sort(this.genome);
+
     }
 
     private double[] movePreferences() {

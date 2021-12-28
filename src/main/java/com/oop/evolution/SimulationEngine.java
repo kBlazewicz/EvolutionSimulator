@@ -2,6 +2,8 @@ package com.oop.evolution;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SimulationEngine {
 
@@ -11,9 +13,15 @@ public class SimulationEngine {
 
     private final int moveEnergy;
 
-    private final int date = 0;
+    private int date = 0;
 
-//    private final ArrayList<Animal> animalNotMovingToday = new ArrayList<>();
+    private final ArrayList<IMapChangeObserver> mapChangeListeners = new ArrayList<>();
+
+    private boolean shutdownRequested = false;
+
+    private boolean pause = true;
+
+    private final ExecutorService service = Executors.newCachedThreadPool();
 
 
     public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int animalsAmount, double jungleRatio, int plantEnergySource) {
@@ -23,35 +31,95 @@ public class SimulationEngine {
         for (int i = 0; i < animalsAmount; i++) {
             generateAnimal();
         }
+        run();
     }
 
-    public void runEngine() {
-        while (map.getNumberOfAnimals() > 0 && date < 2000) {
-            this.nextSimulationDay();
-        }
+    public void run(){
+        service.submit(new Runnable() {
+            @Override
+            public void run() {
+                while (map.getNumberOfAnimals() > 0 && !shutdownRequested) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    while (!pause && map.getNumberOfAnimals() > 0 && !shutdownRequested) {
+                        try {
+                            nextSimulationDay();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+                        try {
+                            Thread.sleep(400);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                }
+                System.out.println("All animals are dead");
+            }
+        });
     }
 
-    private void nextSimulationDay() {
+    public void shutdown() {
+        shutdownRequested = true;
+        service.shutdown();
+        System.out.println("enginge was shutdowned");
+    }
+
+    public void stop() {
+        this.pause = true;
+    }
+
+    public void start() {
+        this.pause = false;
+    }
+
+
+    public int getDate() {
+        return date;
+    }
+
+    public AbstractMap getMap() {
+        return map;
+    }
+
+    //TODO make private
+    public void nextSimulationDay() throws InterruptedException {
+        System.out.println(date);
         map.clear();
 
         ArrayList<Animal> animalArrayList = map.getAnimalArrayList();
         if (!animalArrayList.isEmpty()) {
-            checkForBreeding();
             for (Animal animal : animalArrayList) {
                 animal.move();
             }
+            checkForBreeding();
         }
 
         map.generateGrass();
-
+        date++;
+        notifyMapChange();
     }
 
+    public void addMapChangeListener(IMapChangeObserver object) {
+        mapChangeListeners.add(object);
+    }
+
+    private void notifyMapChange() throws InterruptedException {
+        for (IMapChangeObserver listener : mapChangeListeners) {
+            listener.refreshMap();
+        }
+    }
 
     private void generateAnimal() {
         Vector2d size = map.getSize();
         Random random = new Random();
-        int coordinateX = random.nextInt(size.x);
-        int coordinateY = random.nextInt(size.y);
+        int coordinateX = random.nextInt(size.x+1);
+        int coordinateY = random.nextInt(size.y+1);
 
         Vector2d position = new Vector2d(coordinateX, coordinateY);
         Animal animal = new Animal(map, position, startEnergy, moveEnergy);
@@ -65,10 +133,6 @@ public class SimulationEngine {
                 if (animalsCount[r][c] > 2) {
                     Breeding breeder = new Breeding(new Vector2d(r, c), map);
                     breeder.classicBreeding();
-//                    if (breaded.length > 1) {
-//                        animalNotMovingToday.add(breaded[0]);
-//                        animalNotMovingToday.add(breaded[1]);
-//                    }
                 }
             }
         }
