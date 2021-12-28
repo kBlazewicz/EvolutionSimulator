@@ -4,13 +4,10 @@ import java.util.*;
 
 public abstract class AbstractMap implements IWorldMap {
 
+    protected final LinkedHashMap<Animal, Vector2d> animalsMap = new LinkedHashMap<>();
     //TODO delete animalFieldCount after making UI
     private final int[][] animalFieldCount;
-
     private final Vector2d size;
-
-    protected final LinkedHashMap<Animal, Vector2d> animalsMap = new LinkedHashMap<>();
-
     private final LinkedHashMap<Vector2d, Plant> plantsMap = new LinkedHashMap<>();
 
     private final Jungle jungle;
@@ -119,21 +116,20 @@ public abstract class AbstractMap implements IWorldMap {
         int maxCounter = 0;
         int counter = 0;
         ArrayList<ArrayList<Integer>> genomes = new ArrayList<>();
-        for(Animal animal: animalArrayList){
+        for (Animal animal : animalArrayList) {
             genomes.add(animal.getGenome().getGenome());
         }
         genomes.sort(comparator);
-        if(genomes.isEmpty()){
-            return new ArrayList<Integer>();
+        if (genomes.isEmpty()) {
+            return new ArrayList<>();
         }
-        ArrayList<Integer> maxGenome= genomes.get(0);
+        ArrayList<Integer> maxGenome = genomes.get(0);
         ArrayList<Integer> lastGenome = genomes.get(0);
-        for(ArrayList<Integer> genome : genomes){
-            if (comparator.compare(lastGenome,genome) == 0){
-                counter+=1;
-            }
-            else{
-                if(counter > maxCounter){
+        for (ArrayList<Integer> genome : genomes) {
+            if (comparator.compare(lastGenome, genome) == 0) {
+                counter += 1;
+            } else {
+                if (counter > maxCounter) {
                     maxCounter = counter;
                     counter = 0;
                     maxGenome = lastGenome;
@@ -141,12 +137,12 @@ public abstract class AbstractMap implements IWorldMap {
                 }
             }
         }
-        if(counter > maxCounter){
+        if (counter > maxCounter) {
             maxCounter = counter;
             maxGenome = lastGenome;
         }
 
-        if(maxCounter > 1) {
+        if (maxCounter > 1) {
             System.out.println(maxGenome);
             System.out.println(maxCounter + " <- max genome counter");
         }

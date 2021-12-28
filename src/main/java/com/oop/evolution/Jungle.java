@@ -9,7 +9,7 @@ public class Jungle {
     private final IWorldMap map;
 
 
-    public Jungle(IWorldMap map,double jungleRatio) {
+    public Jungle(IWorldMap map, double jungleRatio) {
         this.map = map;
         this.jungleCoordinates = generateJungle(jungleRatio);
 
@@ -19,7 +19,7 @@ public class Jungle {
         return jungleCoordinates;
     }
 
-    public boolean isJungle(Vector2d position){
+    public boolean isJungle(Vector2d position) {
         return position.followsOrEquals(jungleCoordinates[0]) && position.precedes(jungleCoordinates[1]);
     }
 

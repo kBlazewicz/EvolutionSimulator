@@ -37,7 +37,7 @@ public class Breeding {
 
         if (animal2.getEnergyLevel() >= 0.5 * animal2.getInitialEnergyLevel()) {
             Animal child = new Animal(map, position, animal1.getInitialEnergyLevel(), animal1.getFatigueEnergyLoss());
-            childrenAmount+=1;
+            childrenAmount += 1;
             child.getGenome().genomeFromParents(animal1, animal2);
             animal1.setEnergyLevel((int) round(animal1.getEnergyLevel() * 0.75));
             animal2.setEnergyLevel((int) round(animal2.getEnergyLevel() * 0.75));

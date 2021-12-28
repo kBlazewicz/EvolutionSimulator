@@ -6,25 +6,18 @@ import static java.lang.Math.floor;
 
 public class Animal {
 
-    private Vector2d position;
-
     private final AbstractMap map;
-
     private final int initialEnergyLevel;
-
-    private int energyLevel;
-
     private final int fatigueEnergyLoss;
-
-    private MapDirection direction = MapDirection.generateRandomDirection();
-
     private final ArrayList<IPositionChangeObserver> positionChangeObservers = new ArrayList<>(0);
-
     private final Genome genome = new Genome();
-
     private final ArrayList<Animal> childrenList = new ArrayList<>();
+    private Vector2d position;
+    private int energyLevel;
+    private MapDirection direction = MapDirection.generateRandomDirection();
+    private int childrenAmount = 0;
 
-    private int childrenAmount=0;
+    private int descendantsAmount = 0;
 
     private int deathTime;
 
@@ -67,9 +60,9 @@ public class Animal {
     }
 
     private void makeMove(Vector2d newPosition) {
-            newPosition = map.moveTo(newPosition,this.position);
-            positionChanged(newPosition);
-            this.position = newPosition;
+        newPosition = map.moveTo(newPosition, this.position);
+        positionChanged(newPosition);
+        this.position = newPosition;
     }
 
     public int getDeathTime() {
@@ -121,8 +114,12 @@ public class Animal {
         return energyLevel;
     }
 
-    public double getEnergyPercentage(){
-        return (double)energyLevel/initialEnergyLevel;
+    public void setEnergyLevel(int energyLevel) {
+        this.energyLevel = energyLevel;
+    }
+
+    public double getEnergyPercentage() {
+        return (double) energyLevel / initialEnergyLevel;
     }
 
     public int getInitialEnergyLevel() {
@@ -133,10 +130,6 @@ public class Animal {
         return fatigueEnergyLoss;
     }
 
-    public void setEnergyLevel(int energyLevel) {
-        this.energyLevel = energyLevel;
-    }
-
     public void addPositionObserver(IPositionChangeObserver observer) {
         if (positionChangeObservers.contains(observer)) {
             return;
@@ -144,13 +137,22 @@ public class Animal {
         positionChangeObservers.add(observer);
     }
 
-    public void addChild(Animal child){
+    public void addChild(Animal child) {
         childrenList.add(child);
-        childrenAmount+=1;
+        childrenAmount += 1;
     }
 
-    public int getChildrenAmount(){
+    public int getChildrenAmount() {
         return childrenAmount;
+    }
+
+    public int getDescendantsAmount() {
+        int counter = 0;
+        for (Animal child : childrenList) {
+            counter += 1;
+            counter += child.getDescendantsAmount();
+        }
+        return counter;
     }
 
     private void positionChanged(Vector2d newPosition) {

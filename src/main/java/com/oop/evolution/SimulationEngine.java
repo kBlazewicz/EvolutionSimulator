@@ -8,29 +8,21 @@ import java.util.concurrent.Executors;
 public class SimulationEngine {
 
     private final AbstractMap map;
-
     private final int startEnergy;
-
     private final int moveEnergy;
-
-    private int date = 0;
-
     private final ArrayList<IMapChangeObserver> mapChangeListeners = new ArrayList<>();
-
+    private final ExecutorService service = Executors.newCachedThreadPool();
+    private int date = 0;
     private boolean shutdownRequested = false;
-
     private boolean pause = true;
 
-    private final ExecutorService service = Executors.newCachedThreadPool();
 
-
-    public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int animalsAmount, double jungleRatio, int plantEnergySource,boolean isBordered) {
-       if(isBordered) {
-           this.map = new BorderedMap(width, height, jungleRatio, plantEnergySource);
-       }
-       else{
-           this.map = new GlobeMap(width,height,jungleRatio,plantEnergySource);
-       }
+    public SimulationEngine(int width, int height, int startEnergy, int moveEnergy, int animalsAmount, double jungleRatio, int plantEnergySource, boolean isBordered) {
+        if (isBordered) {
+            this.map = new BorderedMap(width, height, jungleRatio, plantEnergySource);
+        } else {
+            this.map = new GlobeMap(width, height, jungleRatio, plantEnergySource);
+        }
         this.startEnergy = startEnergy;
         this.moveEnergy = moveEnergy;
         for (int i = 0; i < animalsAmount; i++) {
@@ -57,7 +49,7 @@ public class SimulationEngine {
                         }
 
                         try {
-                            Thread.sleep(500);
+                            Thread.sleep(300);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -68,7 +60,6 @@ public class SimulationEngine {
             }
         });
     }
-
 
     public void shutdown() {
         shutdownRequested = true;
@@ -84,7 +75,6 @@ public class SimulationEngine {
         this.pause = false;
     }
 
-
     public int getDate() {
         return date;
     }
@@ -92,7 +82,6 @@ public class SimulationEngine {
     public AbstractMap getMap() {
         return map;
     }
-
 
     private void nextSimulationDay() throws InterruptedException {
         System.out.println(date);
@@ -116,29 +105,29 @@ public class SimulationEngine {
         mapChangeListeners.add(object);
     }
 
-    public int averageEnergy(){
+    public int averageEnergy() {
         ArrayList<Animal> animals = map.getAnimalArrayList();
-        int energy=0;
-        for(Animal animal : animals){
-            energy+=animal.getEnergyLevel();
+        int energy = 0;
+        for (Animal animal : animals) {
+            energy += animal.getEnergyLevel();
         }
-        if(energy==0) return 0;
+        if (energy == 0) return 0;
 
-        return energy/animals.size();
+        return energy / animals.size();
     }
 
-    public int averageAmountOfChildren(){
+    public int averageAmountOfChildren() {
         ArrayList<Animal> animals = map.getAnimalArrayList();
         int average = 0;
-        for(Animal animal : animals){
-           average+=animal.getChildrenAmount();
+        for (Animal animal : animals) {
+            average += animal.getChildrenAmount();
         }
-        if(average==0) return 0;
+        if (average == 0) return 0;
 
-        return average/animals.size();
+        return average / animals.size();
     }
 
-    public int averageLifeTime(){
+    public int averageLifeTime() {
         return map.averageLifeTime();
     }
 
@@ -151,8 +140,8 @@ public class SimulationEngine {
     private void generateAnimal() {
         Vector2d size = map.getSize();
         Random random = new Random();
-        int coordinateX = random.nextInt(size.x+1);
-        int coordinateY = random.nextInt(size.y+1);
+        int coordinateX = random.nextInt(size.x + 1);
+        int coordinateY = random.nextInt(size.y + 1);
 
         Vector2d position = new Vector2d(coordinateX, coordinateY);
         Animal animal = new Animal(map, position, startEnergy, moveEnergy);

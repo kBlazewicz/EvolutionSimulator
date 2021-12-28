@@ -8,9 +8,9 @@ public class BorderedMap extends AbstractMap {
     }
 
     @Override
-    public Vector2d moveTo(Vector2d position,Vector2d oldPosition) {
-        if((position.hasGreaterParameter(getSize())
-                || position.hasSmallerParameter(new Vector2d(0, 0)))){
+    public Vector2d moveTo(Vector2d position, Vector2d oldPosition) {
+        if ((position.hasGreaterParameter(getSize())
+                || position.hasSmallerParameter(new Vector2d(0, 0)))) {
 
             return oldPosition;
         }

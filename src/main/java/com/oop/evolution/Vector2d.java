@@ -3,6 +3,7 @@ package com.oop.evolution;
 import java.util.Objects;
 
 public class Vector2d {
+
     public final int y;
 
     public final int x;

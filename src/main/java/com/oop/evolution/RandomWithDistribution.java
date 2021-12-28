@@ -6,7 +6,9 @@ import java.util.Map;
 //class taken from https://stackoverflow.com/questions/20327958/random-number-with-probabilities/20328491
 
 public class RandomWithDistribution {
+
     private final Map<Integer, Double> distribution;
+
     private double distSum;
 
     public RandomWithDistribution() {
